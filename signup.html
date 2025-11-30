@@ -450,6 +450,15 @@
             cursor: pointer;
         }
 
+        .password-error {
+    color: var(--highlight);
+    font-size: 0.85rem;
+    margin-top: -10px;
+    margin-bottom: 10px;
+    display: none;
+}
+
+
         .form-row {
             display: flex;
             gap: 15px;
@@ -628,6 +637,10 @@
             padding-bottom: 10px;
         }
 
+        footer .footer-col h3 {
+            color: var(--text-light) !important;
+        }
+
         .footer-col h3::after {
             content: '';
             position: absolute;
@@ -784,10 +797,6 @@
             </nav>
             
             <div class="nav-actions">
-                <div class="search-bar">
-                    <input type="text" placeholder="Search...">
-                    <button><i class="fas fa-search"></i></button>
-                </div>
                 <button class="theme-toggle" id="themeToggle">
                     <i class="fas fa-moon"></i>
                 </button>
@@ -863,15 +872,21 @@
                         <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <div class="password-input">
-                            <input type="password" id="password" class="form-control" placeholder="Create a password" required>
-                            <button type="button" class="password-toggle" id="passwordToggle">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
+                   <div class="form-group">
+    <label for="password">Password</label>
+    <div class="password-input">
+        <input type="password" id="password" class="form-control" placeholder="Create a password" required>
+        <button type="button" class="password-toggle" id="passwordToggle">
+            <i class="fas fa-eye"></i>
+        </button>
+    </div>
+
+    <!-- Password Error Popup -->
+    <div id="passwordError" class="password-error">
+        Password must include at least 1 uppercase, 1 lowercase, 1 number, and 1 special character.
+    </div>
+</div>
+
                     
                     <div class="form-group">
                         <label for="confirmPassword">Confirm Password</label>
@@ -1098,6 +1113,23 @@
             }
         });
 
+        // Password Strength Validation
+function validatePasswordStrength(password) {
+    const strongRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._-]).{6,}$/;
+    return strongRegex.test(password);
+}
+
+passwordInput.addEventListener('input', () => {
+    const errorBox = document.getElementById('passwordError');
+
+    if (!validatePasswordStrength(passwordInput.value)) {
+        errorBox.style.display = 'block';
+    } else {
+        errorBox.style.display = 'none';
+    }
+});
+
+
         // Confirm Password Toggle
         confirmPasswordToggle.addEventListener('click', () => {
             const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -1137,11 +1169,12 @@
                 return;
             }
             
-            // Password validation
-            if (password.length < 6) {
-                alert('Password must be at least 6 characters long');
-                return;
-            }
+           // Strong password validation
+if (!validatePasswordStrength(password)) {
+    alert("Password must include:\n• 1 uppercase letter\n• 1 lowercase letter\n• 1 number\n• 1 special character\n• Minimum 6 characters");
+    return;
+}
+
             
             // Password match validation
             if (password !== confirmPassword) {
